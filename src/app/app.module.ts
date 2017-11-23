@@ -25,6 +25,8 @@ import { ReportComponent } from './report/report.component';
 import { AutopilotComponent } from './autopilot/autopilot.component';
 import { AccuracyComponent } from './accuracy/accuracy.component';
 
+import { OrderByPipe } from './pipes/orderby.pipe';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -37,7 +39,8 @@ import { AccuracyComponent } from './accuracy/accuracy.component';
     AIComponent,
     ReportComponent,
     AutopilotComponent,
-    AccuracyComponent
+    AccuracyComponent,
+    OrderByPipe
   ],
   imports: [
     BrowserModule,

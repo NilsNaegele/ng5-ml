@@ -37,9 +37,13 @@ import { Observable } from 'rxjs/Observable';
                 </div>
                 <div class="col-md-5">
                   <h3>Ranked News (Rating Component)</h3>
-                  <div class="alert alert-primary" role="alert" *ngFor="let rated of ratedNews">
+                  <div class="alert alert-primary" role="alert"
+                      *ngFor="let rated of ratedNews | orderBy:'rank':true">
                     <h4 class="alert-heading">{{ rated.title }}</h4>
-                     <p>Ranking: {{ rated.rank }}</p>
+                     <p *ngIf="rated.rank < 2; else elseBlock">Ranking: {{ rated.rank }}</p>
+                     <ng-template #elseBlock>
+                     <p class="d-inline-block bg-danger text-light">Ranking: {{ rated.rank }}</p>
+                     </ng-template>
                      <hr>
                     <a class="alert-link" href="{{ rated.link }}" target="_blank">
                     read more

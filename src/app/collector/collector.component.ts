@@ -23,15 +23,15 @@ import { Observable } from 'rxjs/Observable';
 
               </div>
               <div class="row">
-                <ul class="list-unstyled">
-                    <li *ngFor="let headline of headlines | async; let idx = index; let odd = odd;">
-                          <div [hidden]="cbox.checked" class="row" [style.backgroundColor]="odd ? '#ffe6e6' : '#e6ffe6'">
+                <ul class="list-group">
+                    <li [hidden]="cbox.checked" [style.backgroundColor]="odd ? '#ffe6e6' : '#e6ffe6'"
+                    class="list-group-item"
+                    *ngFor="let headline of headlines | async; let idx = index; let odd = odd;">
                             <input type="checkbox" #cbox
                              (change)="onChange(headline)">
                              {{ idx + 1 }} - {{ headline.title }}
                              {{ headline.pubDate }}
                              <a href="{{ headline.link }}" target="_blank">(read more)</a>
-                          </div>
                     </li>
                 </ul>
               </div>

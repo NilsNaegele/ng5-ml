@@ -2,8 +2,11 @@ import { Component } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection } from 'angularfire2/firestore';
 
 import { CollectorService } from './collector.service';
+import { News } from '../models/news';
 
 import { Observable } from 'rxjs/Observable';
+
+
 
 @Component({
   selector: 'app-collector',
@@ -11,11 +14,13 @@ import { Observable } from 'rxjs/Observable';
             <div [class.container-fluid]="isContainer">
               <div class="row">
                 <h4>{{ caption }}</h4>
+
                 <!--<ul>
                     <li *ngFor="let news of newsItems | async">
                       {{ news.title }}
                     </li>
                 </ul>-->
+
               </div>
               <div class="row">
                 <ul class="list-unstyled">
@@ -38,18 +43,19 @@ import { Observable } from 'rxjs/Observable';
 export class CollectorComponent {
   isContainer = true;
   caption = 'Some news worth investigating';
-  headlines: Observable<any[]>;
+  headlines: Observable<News[]>;
   private newsCollection: AngularFirestoreCollection<any>;
-  newsItems: Observable<any[]>;
+  newsItems: Observable<News[]>;
 
   constructor(private collectorService: CollectorService, afs: AngularFirestore) {
     this.headlines = collectorService.getHeadlines();
-    this.newsCollection = afs.collection<any>('Collector');
+    // console.log(this.headlines);
+    this.newsCollection = afs.collection<News>('Collector');
     this.newsItems = this.newsCollection.valueChanges();
   }
 
   onChange(headline): void {
-    // this.newsCollection.add(headline);
+    this.newsCollection.add(headline);
   }
 
 }

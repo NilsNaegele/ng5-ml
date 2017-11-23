@@ -10,6 +10,9 @@ import { environment } from '../environments/environment';
 
 import { AppRoutingModule } from './app.routing';
 
+import { RatingLogic } from './rating/rating.logic';
+import { RatingService } from './rating/rating.service';
+
 import { AppComponent } from './app.component';
 import { HomeComponent } from './home/home.component';
 import { NavBarComponent } from './nav-bar/nav-bar.component';
@@ -45,7 +48,7 @@ import { AccuracyComponent } from './accuracy/accuracy.component';
     HttpClientModule,
     AppRoutingModule
   ],
-  providers: [],
+  providers: [ RatingLogic, RatingService ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -1,8 +1,12 @@
 import { Injectable, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
+import { News } from '../models/news';
+
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/retry';
+
 
 @Injectable()
 export class CollectorService implements OnInit {
@@ -11,9 +15,10 @@ export class CollectorService implements OnInit {
 
         constructor(private http: HttpClient) {}
 
-        getHeadlines(): Observable<any> {
+        getHeadlines(): Observable<News[]> {
           return this.http.get<any>(this.apiURL)
-                          .map(data => data.query.results.item);
+                          .map(data => data.query.results.item)
+                          .retry(3);
         }
 
         ngOnInit(): void {

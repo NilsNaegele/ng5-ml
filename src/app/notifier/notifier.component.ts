@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { AngularFirestore, AngularFirestoreDocument } from 'angularfire2/firestore';
+import { AngularFirestore, AngularFirestoreDocument,
+         AngularFirestoreCollection } from 'angularfire2/firestore';
 
+import { NotifierService } from './notifier.service';
 import { NotifierConfig } from './notifier.config';
 
 import { Observable } from 'rxjs/Observable';
@@ -55,25 +57,48 @@ import { Observable } from 'rxjs/Observable';
                  </div>
                     <div class="col-md-6">
                         <h3>Suggested News</h3>
-                        <div>some news suggestion content here</div>
+
+                        <div class="media" *ngFor="let ratedNews of ratedNewsItems | async">
+                          <img class="mr-3" src="https://www.gamepoint.com/images/common/icons/icon_news_medium.png" alt="news image">
+                            <div class="media-body">
+                            <h5 class="mt-0">{{ ratedNews.title }}</h5>
+                            {{ ratedNews.description }}
+                            <p><b>Date:</b> {{ ratedNews?.date }}</p>
+                            <p *ngIf="ratedNews.rank === 0; else elseBlock">Ranking: {{ ratedNews.rank }}</p>
+                            <ng-template #elseBlock>
+                            <p class="d-inline-block bg-danger text-light">Ranking: {{ ratedNews.rank }}</p>
+                            </ng-template>
+                            <a href="{{ ratedNews.link }}" target="_blank">
+                                (read more)
+                            </a>
+                            </div>
+                        </div>
                    </div>
                 </div>
           </div>
   `,
+  providers: [ NotifierService ],
   styleUrls: ['./notifier.component.css']
 })
 export class NotifierComponent implements OnInit {
   private notifierConfigDoc: AngularFirestoreDocument<NotifierConfig>;
-
   private notify: Array<boolean> = [true, false];
+
+  private ratedNewsCollection: AngularFirestoreCollection<any>;
+  ratedNewsItems: Observable<any[]>;
+
   notifiers: Array<string> = ['App', 'Email', 'SMS', 'Phone'];
   thresholds: string[] = ['High Rating', 'Medium Rating', 'Low Rating'];
   model = new NotifierConfig(false, 'App', 'Low Rating');
   notifierConfig: Observable<NotifierConfig>;
 
-  constructor(private afs: AngularFirestore) {
+  constructor(private afs: AngularFirestore, private notifierService: NotifierService) {
     this.notifierConfigDoc = afs.doc<NotifierConfig>('Notifier/1');
     this.notifierConfig = this.notifierConfigDoc.valueChanges();
+
+    this.ratedNewsCollection = afs.collection<any>('RatedNews');
+    this.ratedNewsItems = this.ratedNewsCollection.valueChanges();
+
   }
 
   // fetch stored settings from db and initialize the component's private variables with them
@@ -89,6 +114,12 @@ export class NotifierComponent implements OnInit {
         this.notifierConfigDoc.set(this.model);
       }
       // schedule cron job based on values of view
+      const notify = this.model.notify;
+      const notifier = this.model.notifier;
+      const threshold = this.model.threshold;
+      if (notify === true) {
+        this.notifierService.scheduler(notifier, threshold);
+      }
     });
   }
 

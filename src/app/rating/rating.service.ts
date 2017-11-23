@@ -15,7 +15,7 @@ export class RatingService implements OnInit {
   private trends: Rating[] = [];
   protected numberOfTrends = 20;
 
-  constructor(private ratingLogic: RatingLogic, private afs: AngularFirestore) {
+  constructor(public ratingLogic: RatingLogic, private afs: AngularFirestore) {
     this.newsCollection = afs.collection<any>('Collector');
     this.newsItems = this.newsCollection.valueChanges();
     this.trends = ratingLogic.getTrends(this.numberOfTrends);

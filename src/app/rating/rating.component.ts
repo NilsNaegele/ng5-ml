@@ -40,7 +40,7 @@ import { Observable } from 'rxjs/Observable';
                   <div class="alert alert-primary" role="alert"
                       *ngFor="let rated of ratedNews | orderBy:'rank':true">
                     <h4 class="alert-heading">{{ rated.title }}</h4>
-                     <p *ngIf="rated.rank < 2; else elseBlock">Ranking: {{ rated.rank }}</p>
+                     <p *ngIf="rated.rank === 0; else elseBlock">Ranking: {{ rated.rank }}</p>
                      <ng-template #elseBlock>
                      <p class="d-inline-block bg-danger text-light">Ranking: {{ rated.rank }}</p>
                      </ng-template>
@@ -66,7 +66,6 @@ export class RatingComponent implements OnInit  {
               private afs: AngularFirestore) { }
 
   getNews(): void {
-    // this.collectedNews = this.ratingService.getNews();
     this.collectedNews = this.afs.collection<News>('Collector').valueChanges();
   }
 

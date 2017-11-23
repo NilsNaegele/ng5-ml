@@ -13,7 +13,7 @@ import { Observable } from 'rxjs/Observable';
   template: `
             <div [class.container-fluid]="isContainer">
               <div class="row">
-                <h4>{{ caption }}</h4>
+                <h3>{{ caption }}</h3>
 
                 <!--<ul>
                     <li *ngFor="let news of newsItems | async">
@@ -42,14 +42,13 @@ import { Observable } from 'rxjs/Observable';
 })
 export class CollectorComponent {
   isContainer = true;
-  caption = 'Some news worth investigating';
+  caption = 'Some news worth investigating:';
   headlines: Observable<News[]>;
   private newsCollection: AngularFirestoreCollection<any>;
   newsItems: Observable<News[]>;
 
-  constructor(private collectorService: CollectorService, afs: AngularFirestore) {
+  constructor(private collectorService: CollectorService, private afs: AngularFirestore) {
     this.headlines = collectorService.getHeadlines();
-    // console.log(this.headlines);
     this.newsCollection = afs.collection<News>('Collector');
     this.newsItems = this.newsCollection.valueChanges();
   }

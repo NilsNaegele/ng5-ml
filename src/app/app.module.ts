@@ -12,6 +12,7 @@ import { AppRoutingModule } from './app.routing';
 
 import { RatingLogic } from './rating/rating.logic';
 import { RatingService } from './rating/rating.service';
+// import { NotifierService } from './notifier/notifier.service';
 
 import { AppComponent } from './app.component';
 import { HomeComponent } from './home/home.component';
@@ -52,6 +53,6 @@ import { OrderByPipe } from './pipes/orderby.pipe';
     AppRoutingModule
   ],
   providers: [ RatingLogic, RatingService ],
-  bootstrap: [AppComponent]
+  bootstrap: [ AppComponent ]
 })
 export class AppModule { }

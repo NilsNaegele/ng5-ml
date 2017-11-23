@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { AngularFirestore, AngularFirestoreCollection } from 'angularfire2/firestore';
+import { AngularFirestore, AngularFirestoreDocument } from 'angularfire2/firestore';
 
 import { NotifierConfig } from './notifier.config';
 
@@ -63,32 +63,30 @@ import { Observable } from 'rxjs/Observable';
   styleUrls: ['./notifier.component.css']
 })
 export class NotifierComponent implements OnInit {
-  private notifierConfigCollection: AngularFirestoreCollection<any>;
+  private notifierConfigDoc: AngularFirestoreDocument<NotifierConfig>;
+
   private notify: Array<boolean> = [true, false];
   notifiers: Array<string> = ['App', 'Email', 'SMS', 'Phone'];
   thresholds: string[] = ['High Rating', 'Medium Rating', 'Low Rating'];
   model = new NotifierConfig(false, 'App', 'Low Rating');
-  notifierConfig: Observable<any>;
+  notifierConfig: Observable<NotifierConfig>;
 
   constructor(private afs: AngularFirestore) {
-    this.notifierConfigCollection = afs.collection<NotifierConfig>('Notifier');
-    this.notifierConfig = this.notifierConfigCollection.valueChanges();
-    // this.updateView();
+    this.notifierConfigDoc = afs.doc<NotifierConfig>('Notifier/1');
+    this.notifierConfig = this.notifierConfigDoc.valueChanges();
   }
 
   // fetch stored settings from db and initialize the component's private variables with them
   updateView() {
     this.notifierConfig.subscribe(snapshot => {
       if (snapshot) {
-        console.log(snapshot);
         this.model = {
-          'notify': snapshot[0].notify,
-          'notifier': snapshot[0].notifier,
-          'threshold': snapshot[0].threshold
+          'notify': snapshot.notify,
+          'notifier': snapshot.notifier,
+          'threshold': snapshot.threshold
         };
-        console.log(this.model);
       } else {
-        this.notifierConfigCollection.add(this.model);
+        this.notifierConfigDoc.set(this.model);
       }
       // schedule cron job based on values of view
     });
@@ -107,12 +105,8 @@ export class NotifierComponent implements OnInit {
         this.model.threshold = value;
         break;
       }
-      if (this.model.notify !== undefined &&
-          this.model.notifier !== undefined &&
-          this.model.threshold !== undefined) {
-      // this.updateItem();
-      console.log('hello world');
-    }
+      this.notifierConfigDoc.update(this.model);
+
   }
 
   ngOnInit() {

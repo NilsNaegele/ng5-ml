@@ -5,6 +5,7 @@ import { Component, OnInit } from '@angular/core';
   template: `
         <div class="container-fluid">
             <h4>Home Component</h4>
+            <h5>Tolerance, enlightenment, progress ...</h5>
         </div>
   `,
   styleUrls: ['./home.component.css']

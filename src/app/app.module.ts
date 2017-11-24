@@ -12,7 +12,6 @@ import { AppRoutingModule } from './app.routing';
 
 import { RatingLogic } from './rating/rating.logic';
 import { RatingService } from './rating/rating.service';
-// import { NotifierService } from './notifier/notifier.service';
 import { CollectorService } from './collector/collector.service';
 import { EvidenceService } from './evidence/evidence.service';
 
@@ -29,6 +28,7 @@ import { AutopilotComponent } from './autopilot/autopilot.component';
 import { AccuracyComponent } from './accuracy/accuracy.component';
 
 import { OrderByPipe } from './pipes/orderby.pipe';
+import { TruncatePipe } from './pipes/truncate.pipe';
 
 @NgModule({
   declarations: [
@@ -43,7 +43,8 @@ import { OrderByPipe } from './pipes/orderby.pipe';
     ReportComponent,
     AutopilotComponent,
     AccuracyComponent,
-    OrderByPipe
+    OrderByPipe,
+    TruncatePipe
   ],
   imports: [
     BrowserModule,

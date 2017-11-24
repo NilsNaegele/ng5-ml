@@ -12,9 +12,66 @@ import { Subject } from 'rxjs/Subject';
   template: `
             <div class="container-fluid">
               <div class="row">
-                    <h4>Evidence:</h4>
-              </div>
-              <div class="row">
+              <div class=col-md-5>
+              <div class="card">
+              <h4 class="card-header">Available News Items</h4>
+                <div class="card-body">
+                    <h4 class="card-title" *ngFor="let news of ratedNewsItems | async">
+                        <div class="input-group">
+                          <span class="input-group-addon">
+                            <input type="radio" (click)="onSelect(news, true)"
+                            aria-label="Radio button for following span">
+                          </span>
+                          <span class="form-control alert alert-warning">{{ news.title }}
+                          <a href="{{ news.link}}" target="_blank">(more)</a>
+                          </span>
+                        </div>
+                    </h4>
+                    <div class="card-text">
+                    <div class="input-group">
+                        <input type="text" class="form-control" #urlBox
+                        placeholder="Search for other URL News/Article here ..." aria-label="Search for...">
+                        <span class="input-group-btn">
+                        <button class="btn btn-warning text-white" (click)="onSelect(urlBox.value, false)"
+                        type="button">Go!</button>
+                        </span>
+                    </div>
+                    </div>
+                </div>
+             </div>
+             <ul class="list-group mt-3">
+                 <li class="list-group-item list-group-item-action active">Nominated keywords for corpus</li>
+                 <li class="list-group-item">
+                 <div class="input-group">
+                    <input type="text" [(ngModel)]="supportKeywords" class="form-control" placeholder="Comma separated support keywords"
+                      aria-label="Support keywords">
+                 </div>
+                 </li>
+                 <li class="list-group-item">
+                 <div class="input-group">
+                    <input type="text" [(ngModel)]="mainKeyword" class="form-control" placeholder="Keyword of interest"
+                      aria-label="Keyword interest">
+                 </div>
+                 </li>
+                 <li class="list-group-item list-group-item-action">
+                 <button type="submit" (click)="buildCorpus()" class="btn btn-dark btn-lg btn-block">
+                 Fetch Articles For Corpus
+                 </button>
+                 </li>
+            </ul>
+            <div class="card mt-3 text-white bg-danger mb-3">
+                  <h4 class="card-header">Extracted Contents</h4>
+                      <div class="card-body">
+                          <h4 class="card-title">
+                            extracted title contents here
+                          </h4>
+                            <div class="card-text">
+                              extracted text contents here
+                              </div>
+                      </div>
+           </div>
+        </div>
+              <div class="col-md-7">
               <table class="table table-responsive-lg table-hover">
               <thead>
                   <tr class="bg-dark text-white">
@@ -45,6 +102,7 @@ import { Subject } from 'rxjs/Subject';
               </tbody>
               </table>
               </div>
+              </div>
             </div>
   `,
   styleUrls: ['./evidence.component.css']
@@ -53,11 +111,29 @@ export class EvidenceComponent implements OnInit {
   private ratedNewsCollection: AngularFirestoreCollection<News>;
   ratedNewsItems: Observable<News[]>;
 
+  supportKeywords;
+  mainKeyword;
+
   constructor(public evidenceService: EvidenceService,
               private afs: AngularFirestore) {
-    this.ratedNewsCollection = afs.collection<News>('RatedNews', ref => ref.orderBy('rank', 'desc').limit(1));
+    this.ratedNewsCollection = afs.collection<News>('RatedNews', ref => ref.orderBy('rank', 'desc').limit(5));
     this.ratedNewsItems = this.ratedNewsCollection.valueChanges();
 
+  }
+
+  onSelect(item: any, isRadio: boolean) {
+    // this.resetCounters();
+    const URL = isRadio ? item.link : item;
+    // this.evidenceService.wordAnalyzer(URL);
+  }
+
+  resetCounters() {
+    // this.article = null;
+    // this.words = null;
+  }
+
+  buildCorpus() {
+    // get input keywords and fetch related articles/news
   }
 
   analyzeWords(link: string) {

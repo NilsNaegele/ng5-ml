@@ -57,16 +57,15 @@ import { Observable } from 'rxjs/Observable';
                  </div>
                     <div class="col-md-6">
                         <h3>Suggested News</h3>
-
-                        <div class="media" *ngFor="let ratedNews of ratedNewsItems | async">
+                        <div class="media" *ngFor="let ratedNews of ratedNewsItems | async | orderBy:'rank':true">
                           <img class="mr-3" src="https://www.gamepoint.com/images/common/icons/icon_news_medium.png" alt="news image">
                             <div class="media-body">
-                            <h5 class="mt-0">{{ ratedNews.title }}</h5>
-                            {{ ratedNews.description }}
+                            <h5 class="mt-0">{{ ratedNews?.title }}</h5>
+                            {{ ratedNews?.description }}
                             <p><b>Date:</b> {{ ratedNews?.date }}</p>
-                            <p *ngIf="ratedNews.rank === 0; else elseBlock">Ranking: {{ ratedNews.rank }}</p>
+                            <p *ngIf="ratedNews?.rank === 0; else elseBlock">Ranking: {{ ratedNews?.rank }}</p>
                             <ng-template #elseBlock>
-                            <p class="d-inline-block bg-danger text-light">Ranking: {{ ratedNews.rank }}</p>
+                            <p class="d-inline-block bg-danger text-light">Ranking: {{ ratedNews?.rank }}</p>
                             </ng-template>
                             <a href="{{ ratedNews.link }}" target="_blank">
                                 (read more)

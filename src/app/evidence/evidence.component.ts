@@ -60,13 +60,10 @@ import { Subject } from 'rxjs/Subject';
                  </li>
             </ul>
             <div class="card mt-3 text-white bg-danger mb-3">
-                  <h4 class="card-header">Extracted Contents</h4>
+                  <h4 class="card-header">Extracted Contents:</h4>
                       <div class="card-body">
-                          <h4 class="card-title">
-                            extracted title contents here
-                          </h4>
                             <div class="card-text">
-                              extracted text contents here
+                              {{ evidenceService.article }}
                               </div>
                       </div>
            </div>
@@ -75,14 +72,21 @@ import { Subject } from 'rxjs/Subject';
               <table class="table table-responsive-lg table-hover">
               <thead>
                   <tr class="bg-dark text-white">
-                      <th colspan="7">Processing Words</th>
+                      <th colspan="6">
+                      Processing Words ( corpus: {{ evidenceService.corpusSize }} items -
+                                         vocabulary: {{ evidenceService.vocabularySize }} words )
+                      </th>
+                      <th colspan="1">
+                      <button (click)="calculateIDFs()" type="button"
+                              class="btn btn-default active">Calculate IDFs</button>
+                      </th>
                   </tr>
                   <tr class="bg-dark text-white text-center">
                     <th scope="col">#</th>
                     <th scope="col">Words</th>
-                    <th scope="col">Raw</th>
-                    <th scope="col">Normalized Value</th>
-                    <th scope="col">IDF Factor</th>
+                    <th scope="col">Count</th>
+                    <th scope="col">Normalized</th>
+                    <th scope="col">IDF</th>
                     <th scope="col">TFIDF(C)</th>
                     <th scope="col">TFIDF(N)</th>
                  </tr>
@@ -92,7 +96,7 @@ import { Subject } from 'rxjs/Subject';
               <tr class="text-white text-center" [class.bg-primary]="even" [class.bg-success]="odd"
                 [class.bg-warning]="last" [class.bg-danger]="first">
                 <th scope="row">{{ i + 1 }}</th>
-                <td>{{ w.word | truncate:30 }}</td>
+                <td>{{ w.word }}</td>
                 <td>{{ w.count }}</td>
                 <td>{{ w.normalized }}</td>
                 <td>{{ w.idf }}</td>
@@ -105,14 +109,15 @@ import { Subject } from 'rxjs/Subject';
               </div>
             </div>
   `,
+  providers: [ EvidenceService ],
   styleUrls: ['./evidence.component.css']
 })
 export class EvidenceComponent implements OnInit {
   private ratedNewsCollection: AngularFirestoreCollection<News>;
   ratedNewsItems: Observable<News[]>;
 
-  supportKeywords;
-  mainKeyword;
+  supportKeywords = '';
+  mainKeyword = '';
 
   constructor(public evidenceService: EvidenceService,
               private afs: AngularFirestore) {
@@ -124,16 +129,23 @@ export class EvidenceComponent implements OnInit {
   onSelect(item: any, isRadio: boolean) {
     // this.resetCounters();
     const URL = isRadio ? item.link : item;
-    // this.evidenceService.wordAnalyzer(URL);
+    if (!URL) { return; }
+    if (isRadio) {
+    this.evidenceService.wordAnalyzer(URL);
+   }
   }
 
-  resetCounters() {
-    // this.article = null;
-    // this.words = null;
+  calculateIDFs() {
+    console.log('calculateIDFs clicked');
+    this.evidenceService.saveInverseDocumentFrequency();
   }
 
   buildCorpus() {
-    // get input keywords and fetch related articles/news
+    if (this.supportKeywords && this.mainKeyword) {
+      console.log(this.supportKeywords, this.mainKeyword);
+      this.supportKeywords = '';
+      this.mainKeyword = '';
+    }
   }
 
   analyzeWords(link: string) {

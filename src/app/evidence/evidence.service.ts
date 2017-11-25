@@ -1,15 +1,75 @@
 import { Injectable } from '@angular/core';
-
 import { HttpClient } from '@angular/common/http';
+import { AngularFirestore, AngularFirestoreCollection } from 'angularfire2/firestore';
 
+import { environment } from '../../environments/environment';
+import { Corpus } from '../models/corpus';
 import { Observable } from 'rxjs/Observable';
 
 @Injectable()
 export class EvidenceService {
-  words = [];
-  private article = '';
+  private corpusCollection: AngularFirestoreCollection<any>;
+  private corpusItems: Observable<Corpus[]>;
+  private idfsCollection: AngularFirestoreCollection<any>;
+  private idfsItems: Observable<any[]>;
 
-  constructor(private http: HttpClient) { }
+  corpusSize = 0;
+  vocabularySize = 0;
+  words = [];
+  article = '';
+
+  constructor(private http: HttpClient, private afs: AngularFirestore) {
+    this.corpusCollection = afs.collection<Corpus>('Evidence-Corpus-Articles');
+    this.corpusItems = this.corpusCollection.valueChanges();
+
+    this.idfsCollection = afs.collection<any>('Evidence-Corpus-IDFs');
+    this.idfsItems = this.idfsCollection.valueChanges();
+    // this.idfsItems = afs.collection<any>('Evidence-Corpus-IDFs').valueChanges();
+  }
+
+  corpusBuilder(mainKeyword, supportKeywords) {
+    // 1. fetch links for each keyword
+    // 2. pass the link for extracting contents
+    // 3. save them under corpus for further calculation
+    this.resetCounters();
+    const keywords = this.setKeywordArray(mainKeyword, supportKeywords);
+    keywords.forEach((keyword: any) => this.fetchLinks(keyword));
+  }
+
+  setKeywordArray(mainKeyword, supportKeywords): string[] {
+    let keywords = [];
+    if (supportKeywords) {
+      keywords = supportKeywords.split(',');
+      keywords.forEach(keyword => {
+        keywords.push(`${mainKeyword}, ${keyword}`);
+      });
+      keywords.unshift(mainKeyword);
+      return keywords;
+    }
+  }
+
+  fetchLinks(keyword) {
+        environment.timeSpans.forEach((period) => {
+          this.getSearchResults(this.getGoogleQueryUrl(keyword, period))
+          .subscribe(data => data.forEach((item) => {
+            this.wordAnalyzer(item.link);
+          }));
+        });
+  }
+
+  getGoogleQueryUrl(keyword: string, range: any): string {
+    return `https://www.googleapis.com/customsearch/v1?key=${environment.googleSearchConfig.apiKey}
+            &cx=${environment.googleSearchConfig.cx}&q=${keyword}&sort=${range.sort}&dateRestrict${range.span}`;
+  }
+
+  getSearchResults(url: string): Observable<any> {
+    return this.http.get<any>(url).map(data => data.items);
+  }
+
+  resetCounters() {
+    this.article = null;
+    this.words = [];
+  }
 
   wordCounts(url) {
     // get a url subscribe to its response and call other
@@ -20,34 +80,33 @@ export class EvidenceService {
 
   wordAnalyzer(link: string) {
     this.getArticle(this.getYahooQueryURL(link)).subscribe(data => {
+      this.resetCounters();
       this.findKey(data, 'content');
-      this.words = this.evaluateWords(this.countInstances(this.extractWords(this.article)));
+      if (this.article) {
+        this.evaluateWords(this.countInstances(this.extractWords(this.article))).then(words => {
+          this.corpusCollection.add({article: this.article, link: link, bag_of_words: words });
+        });
+      }
+      // this.words = this.evaluateWords(this.countInstances(this.extractWords(this.article)));
       // console.log(this.words);
     });
   }
 
-  saveInverseDocumentFrequency(instance) {
-    const corpusSize = 1000;
-    const docsWithWords = 55;
-    return Math.log2(corpusSize / (1 + docsWithWords));
+  saveInverseDocumentFrequency() {
+    const uniqueBagOfWords = {};
+
   }
 
-  evaluateWords(instances): Array<any> {
-      const words = [];
+  evaluateWords(instances) {
       const normFactor = this.calculateNorm(instances);
-      instances.forEach((instance) => {
-        const normalized = instance.count / normFactor;
-        const inverseDocumentFrequency = this.saveInverseDocumentFrequency(instance);
-        words.push({
-          word: instance.word,
-          count: instance.count,
-          normalized: normalized.toFixed(5),
-          idf: inverseDocumentFrequency.toFixed(5),
-          tfidf_N: (normalized * inverseDocumentFrequency).toFixed(5),
-          tfidf_C: (instance.count * inverseDocumentFrequency).toFixed(5)
-        });
-      });
-      return words;
+      return Promise.all(instances
+        .filter((f) => f.word.length < 20)
+        .map((w) => {
+          const normalized = w.count / normFactor;
+          w['normalized'] = normalized.toFixed(4);
+          this.words.push(w);
+          return w;
+      }));
   }
 
   calculateNorm(rawWords: Array<any>): number {

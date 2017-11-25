@@ -14,13 +14,6 @@ import { Observable } from 'rxjs/Observable';
             <div [class.container-fluid]="isContainer">
               <div class="row">
                 <h3>{{ caption }}</h3>
-
-                <!--<ul>
-                    <li *ngFor="let news of newsItems | async">
-                      {{ news.title }}
-                    </li>
-                </ul>-->
-
               </div>
               <div class="row">
                 <ul class="list-group">

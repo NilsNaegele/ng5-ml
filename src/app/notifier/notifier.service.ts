@@ -10,7 +10,7 @@ import 'rxjs/add/operator/map';
 @Injectable()
 export class NotifierService {
   private cron = require('node-cron');
-  private threshold = [1, 5, 10];
+  private threshold = [3, 5, 10];
   private ratedNewsCollection: AngularFirestoreCollection<any>;
   private items: Observable<any[]>;
 
@@ -35,7 +35,12 @@ export class NotifierService {
 
   scheduler(notifier: string, threshold: string) {
       const self = this;
+      console.log('inside scheduler');
+      if (this.task !== null) {
+        this.task = null;
+      }
       this.task = this.cron.schedule('* */23 * * *', function () {
+        console.log('inside cron job');
         self.removeOldNews();
         self.collectRateNotify(notifier, threshold);
       });

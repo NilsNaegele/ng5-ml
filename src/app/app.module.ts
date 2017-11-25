@@ -13,7 +13,6 @@ import { AppRoutingModule } from './app.routing';
 import { RatingLogic } from './rating/rating.logic';
 import { RatingService } from './rating/rating.service';
 import { CollectorService } from './collector/collector.service';
-import { EvidenceService } from './evidence/evidence.service';
 
 import { AppComponent } from './app.component';
 import { HomeComponent } from './home/home.component';
@@ -55,7 +54,21 @@ import { TruncatePipe } from './pipes/truncate.pipe';
     HttpClientModule,
     AppRoutingModule
   ],
-  providers: [ RatingLogic, RatingService, CollectorService, EvidenceService ],
+  providers: [ RatingLogic, RatingService, CollectorService ],
   bootstrap: [ AppComponent ]
 })
 export class AppModule { }
+
+// export const googleSearchConfig = {
+//   apiKey: 'AIzaSyAt1k2kewjglCuyw9ikD6NF_UD9JfA4DCU',
+//   cx: '004287087866899583493:olritvv2h9i'
+// }
+//
+// export const timeSpans = [
+//     { 'span': 'd1', 'sort': 'date:d' },
+//     { 'span': 'w1', 'sort': 'date:a' },
+//     { 'span': 'm1', 'sort': 'date:a' },
+//     { 'span': 'm6', 'sort': 'date:a' },
+//     { 'span': 'y1', 'sort': 'date:a' },
+//     { 'span': 'y10', 'sort': 'date:a' }
+// ];

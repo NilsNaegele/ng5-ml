@@ -13,7 +13,7 @@ export class EvidenceService {
   private idfsCollection: AngularFirestoreCollection<any>;
   private idfsItems: Observable<any[]>;
 
-  corpusSize = 342;
+  corpusSize = 432;
   vocabularySize = 0;
   words = [];
   article = '';

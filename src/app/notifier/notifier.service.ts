@@ -39,7 +39,7 @@ export class NotifierService {
       if (this.task !== null) {
         this.task = null;
       }
-      this.task = this.cron.schedule('* */23 * * *', function () {
+      this.task = this.cron.schedule('*1 */23 * * *', function () {
         console.log('inside cron job');
         self.removeOldNews();
         self.collectRateNotify(notifier, threshold);

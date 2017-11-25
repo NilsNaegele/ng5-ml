@@ -143,7 +143,7 @@ export class EvidenceComponent implements OnInit {
   buildCorpus() {
     if (this.supportKeywords && this.mainKeyword) {
       console.log(this.supportKeywords, this.mainKeyword);
-      this.evidenceService.corpusBuilder(this.mainKeyword, this.supportKeywords);
+      // this.evidenceService.corpusBuilder(this.mainKeyword, this.supportKeywords);
       this.supportKeywords = '';
       this.mainKeyword = '';
     }
@@ -155,7 +155,9 @@ export class EvidenceComponent implements OnInit {
 
   ngOnInit() {
     this.ratedNewsItems.subscribe(rate => {
+          if (rate && rate.length > 0) {
           this.analyzeWords(rate[0].link);
+        }
     });
   }
 

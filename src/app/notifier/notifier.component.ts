@@ -67,7 +67,7 @@ import { Observable } from 'rxjs/Observable';
                             <ng-template #elseBlock>
                             <p class="d-inline-block bg-danger text-light">Ranking: {{ ratedNews?.rank }}</p>
                             </ng-template>
-                            <a href="{{ ratedNews.link }}" target="_blank">
+                            <a href="{{ ratedNews?.link }}" target="_blank">
                                 (read more)
                             </a>
                             </div>
@@ -117,7 +117,7 @@ export class NotifierComponent implements OnInit {
       const notifier = this.model.notifier;
       const threshold = this.model.threshold;
       if (notify === true) {
-        this.notifierService.scheduler(notifier, threshold);
+        // this.notifierService.scheduler(notifier, threshold);
       }
     });
   }

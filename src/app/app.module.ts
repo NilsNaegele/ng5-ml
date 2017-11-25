@@ -25,6 +25,7 @@ import { AIComponent } from './ai/ai.component';
 import { ReportComponent } from './report/report.component';
 import { AutopilotComponent } from './autopilot/autopilot.component';
 import { AccuracyComponent } from './accuracy/accuracy.component';
+import { ReportTemplateComponent } from './report/report-template.component';
 
 import { OrderByPipe } from './pipes/orderby.pipe';
 import { TruncatePipe } from './pipes/truncate.pipe';
@@ -42,6 +43,7 @@ import { TruncatePipe } from './pipes/truncate.pipe';
     ReportComponent,
     AutopilotComponent,
     AccuracyComponent,
+    ReportTemplateComponent,
     OrderByPipe,
     TruncatePipe
   ],

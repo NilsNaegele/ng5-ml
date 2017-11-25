@@ -13,7 +13,7 @@ export class EvidenceService {
   private idfsCollection: AngularFirestoreCollection<any>;
   private idfsItems: Observable<any[]>;
 
-  corpusSize = 0;
+  corpusSize = 342;
   vocabularySize = 0;
   words = [];
   article = '';
@@ -24,7 +24,6 @@ export class EvidenceService {
 
     this.idfsCollection = afs.collection<any>('Evidence-Corpus-IDFs');
     this.idfsItems = this.idfsCollection.valueChanges();
-    // this.idfsItems = afs.collection<any>('Evidence-Corpus-IDFs').valueChanges();
   }
 
   corpusBuilder(mainKeyword, supportKeywords) {
@@ -95,15 +94,56 @@ export class EvidenceService {
   saveInverseDocumentFrequency() {
     const uniqueBagOfWords = {};
 
+    // remove previous IDFs calculations every time a new article is added
+    // this.IDF remove
+    this.idfsCollection.snapshotChanges().map(snapshot => {
+      this.corpusSize = snapshot.length;
+      snapshot.map(a => {
+          const data = a.payload.doc.data();
+          const id = a.payload.doc.id;
+          return { id, ...data };
+      });
+      snapshot.forEach(item => {
+        item.payload['bag_of_words'].forEach(w => {
+          uniqueBagOfWords.hasOwnProperty(w.word) ?
+          uniqueBagOfWords[w.word]++ : uniqueBagOfWords[w.word] = 1;
+        });
+      });
+      const words = Object.keys(uniqueBagOfWords);
+      this.vocabularySize = words.length;
+      words.forEach(word => {
+        const idf = Math.abs(Math.log2(this.corpusSize / uniqueBagOfWords[word] + 1));
+        this.idfsCollection.add({'word': word, 'doc_with_word': uniqueBagOfWords[word], 'IDF': idf});
+        this.words.some((item) => {
+          if (item.word === word) {
+            item['idf'] = idf.toFixed(4);
+            item['tfidf_C'] = (idf * item.count).toFixed(4);
+            item['tfidf_N'] = (idf * item.normalized).toFixed(4);
+            return true;
+          }
+        });
+      });
+    });
+  }
+
+  saveInverseDocumentFrequencyTest() {
+     const corpusSize = 100;
+     const docsWithWords = 55;
+     return Math.log2(corpusSize / (1 + docsWithWords));
   }
 
   evaluateWords(instances) {
       const normFactor = this.calculateNorm(instances);
+      this.vocabularySize = instances.length;
       return Promise.all(instances
         .filter((f) => f.word.length < 20)
         .map((w) => {
           const normalized = w.count / normFactor;
+          const inverseDocumentFrequency = this.saveInverseDocumentFrequencyTest();
           w['normalized'] = normalized.toFixed(4);
+          w['idf'] = inverseDocumentFrequency.toFixed(4);
+          w['tfidf_N'] = (normalized * inverseDocumentFrequency).toFixed(4);
+          w['tfidf_C'] = (w.count * inverseDocumentFrequency).toFixed(4);
           this.words.push(w);
           return w;
       }));

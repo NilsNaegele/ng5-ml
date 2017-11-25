@@ -131,18 +131,19 @@ export class EvidenceComponent implements OnInit {
     const URL = isRadio ? item.link : item;
     if (!URL) { return; }
     if (isRadio) {
-    this.evidenceService.wordAnalyzer(URL);
-   }
+    // this.evidenceService.wordAnalyzer(URL);
+    }
   }
 
   calculateIDFs() {
     console.log('calculateIDFs clicked');
-    this.evidenceService.saveInverseDocumentFrequency();
+    // this.evidenceService.saveInverseDocumentFrequency();
   }
 
   buildCorpus() {
     if (this.supportKeywords && this.mainKeyword) {
       console.log(this.supportKeywords, this.mainKeyword);
+      this.evidenceService.corpusBuilder(this.mainKeyword, this.supportKeywords);
       this.supportKeywords = '';
       this.mainKeyword = '';
     }
